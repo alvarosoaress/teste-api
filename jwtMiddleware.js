@@ -8,12 +8,16 @@ export const verifyToken = async (req, res, next) => {
     return res.status(401).json('Token de autorização é necessário !');
   }
 
-  const authToken = headerToken.split(' ')[1];
+  const authToken = headerToken.split(' ')[1].trim();
 
   jwt.verify(
     authToken,
     'senhasuperhiperdemaissecretamesmoshiu',
     async (err, decoded) => {
+      if (!decoded || !decoded.sub) {
+        return res.status(401).json('Token de autorização é inválido !');
+      }
+
       const query = `
           SELECT * FROM user WHERE id = ?
         `;
