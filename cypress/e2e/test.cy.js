@@ -2,14 +2,14 @@
 
 const API_URL = 'http://129.148.47.221:8800';
 
-const EMAIL = 'xaiomi@cn.com';
+const EMAIL = 'christine@cn.com';
 
-const NEW_EMAIL = 'samsungo@kr.com';
+const NEW_EMAIL = 'sayu@kr.com';
 
 describe('API Test', () => {
   let USER_TOKEN;
 
-  it('should return an array of all users', () => {
+  it('deve retornar um array listando todos usuários cadastrados', () => {
     cy.request({
       method: 'GET',
       url: `${API_URL}`,
@@ -20,13 +20,13 @@ describe('API Test', () => {
     });
   });
 
-  it('should register a new user', () => {
+  it('deve registrar um novo usuário', () => {
     cy.request({
       method: 'POST',
       url: `${API_URL}/usuario/registrar`,
       headers: {},
       body: {
-        nome: 'Xai Omi',
+        nome: 'Christine Golden',
         email: EMAIL,
         senha: 'senhamuitoseguraconfia7896',
       },
@@ -35,12 +35,10 @@ describe('API Test', () => {
       expect(body.email).to.eq(EMAIL);
       expect(body.accessToken).to.exist;
       USER_TOKEN = `Bearer ${body.accessToken}`;
-
-      console.log(USER_TOKEN);
     });
   });
 
-  it('should refuse to register same email for two users', () => {
+  it('deve impedir o registro de dois usuários com o mesmo email', () => {
     cy.request({
       method: 'POST',
       url: `${API_URL}/usuario/registrar`,
@@ -56,7 +54,7 @@ describe('API Test', () => {
     });
   });
 
-  it('should update existing user', () => {
+  it('deve atualizar um usuário existente', () => {
     cy.request({
       method: 'PUT',
       url: `${API_URL}/usuario/atualizar`,
@@ -64,17 +62,17 @@ describe('API Test', () => {
         Authorization: USER_TOKEN,
       },
       body: {
-        nome: 'Mouse Pad',
+        nome: 'Sayu',
         email: NEW_EMAIL,
         senha: 'senhamuitoseguraconfia7896',
       },
     }).then(({ status, body }) => {
       expect(status).to.eq(200);
-      expect(body.nome).to.eq('Mouse Pad');
+      expect(body.nome).to.eq('Sayu');
     });
   });
 
-  it('should refuse to update user if email already exists', () => {
+  it('deve impedir a atualização do email de um usuário existente para outro também já existente', () => {
     cy.request({
       method: 'PUT',
       url: `${API_URL}/usuario/atualizar`,
@@ -82,7 +80,7 @@ describe('API Test', () => {
         Authorization: USER_TOKEN,
       },
       body: {
-        nome: 'Mouse Pad',
+        nome: 'Sayu',
         email: 'joao@email.com',
         senha: 'senhamuitoseguraconfia7896',
       },
@@ -92,7 +90,7 @@ describe('API Test', () => {
     });
   });
 
-  it('should delete a user already registered', () => {
+  it('deve excluir um usuário registrado', () => {
     cy.request({
       method: 'DELETE',
       url: `${API_URL}/usuario/deletar`,
