@@ -1,0 +1,22 @@
+{
+    "env": {
+      "commonjs": true,
+      "es2021": true,
+      "node": true
+    },
+
+    "plugins": ["prettier"],
+    "extends": [ "prettier"],
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+      "semi": "off",
+       "prettier/prettier": [
+        "error",
+        {
+          "endOfLine": "auto"
+        }
+      ]
+    }
+  }
