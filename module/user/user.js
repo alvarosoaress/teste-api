@@ -1,9 +1,9 @@
 import express from 'express';
-import db from '../../db.js';
+import db from '../../src/db.js';
 import jwt from 'jsonwebtoken';
 import { deleteSchema, registerSchema, updateSchema } from './userSchema.js';
-import validate from '../../validateRequest.js';
-import { verifyToken } from '../../jwtMiddleware.js';
+import validate from '../../src/validateRequest.js';
+import { verifyToken } from '../../src/jwtMiddleware.js';
 
 const router = express.Router();
 

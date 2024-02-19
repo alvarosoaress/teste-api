@@ -1,0 +1,382 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Api Praxio Teste Documentação",
+    "version": "1.0"
+  },
+  "tags": [
+    {
+      "name": "Usuário",
+      "description": "Operações sobre usuário"
+    }
+  ],
+  "paths": {
+    "/usuario/registrar": {
+      "post": {
+        "tags": ["Usuário"],
+        "summary": "Criar novo usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreateRes"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuário duplicado",
+            "content": {
+              "application/json": {
+                "string": "Usuário com email já existente"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuario/listar": {
+      "get": {
+        "tags": ["Usuário"],
+        "summary": "Listar todos usuários",
+        "responses": {
+          "200": {
+            "description": "Usuários",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListRes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nenhum usuário encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuario/email/{emailUsuario}": {
+      "get": {
+        "tags": ["Usuário"],
+        "summary": "Requisitar usuário especifico",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "emailUsuario",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Email do usuário requerido."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGetRes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuario/atualizar": {
+      "put": {
+        "security": [
+          {
+            "userToken": []
+          }
+        ],
+        "tags": ["Usuário"],
+        "summary": "Atualizar usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserUpdateRes"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuário com email informado já existe!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token de autorização é inválido !",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuario/deletar": {
+      "delete": {
+        "security": [
+          {
+            "userToken": []
+          }
+        ],
+        "tags": ["Usuário"],
+        "summary": "Excluir usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDeleteSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário excluído",
+            "content": {
+              "application/json": {
+                "string": "Usuário com email informado excluído!"
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Você não tem permissão para realizar essa operação neste usuário !",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "userToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Token do usuário"
+      }
+    },
+    "schemas": {
+      "UserCreateSchema": {
+        "type": "object",
+        "required": ["nome", "email", "senha"],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "email": {
+            "type": "string",
+            "example": "alice@email.com"
+          },
+          "senha": {
+            "type": "string",
+            "example": "senhasupersegura321"
+          }
+        }
+      },
+      "UserCreateRes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "nome": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "email": {
+            "type": "string",
+            "example": "alice@email.com"
+          },
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDgzNDE0MzgsImV4cCI6MTcwODk0NjIzOCwic3ViIjoiNDgifQ.XbBLv-5w8pNz6-u1tVB79gNshCcr89622D7vSLA2hJ0"
+          }
+        }
+      },
+      "UserGetRes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "nome": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "email": {
+            "type": "string",
+            "example": "alice@email.com"
+          }
+        }
+      },
+      "UserListRes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "nome": {
+              "type": "string",
+              "example": "Alice"
+            },
+            "email": {
+              "type": "string",
+              "example": "alice@email.com"
+            }
+          }
+        }
+      },
+      "UserUpdateSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "email": {
+            "type": "string",
+            "example": "alice@email.com"
+          },
+          "senha": {
+            "type": "string",
+            "example": "senhasupersegura321"
+          }
+        }
+      },
+      "UserUpdateRes": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "email": {
+            "type": "string",
+            "example": "alice@email.com"
+          },
+          "senha": {
+            "type": "string",
+            "example": "senhasupersegura321"
+          }
+        }
+      },
+      "UserDeleteSchema": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "alice@email.com"
+          }
+        }
+      },
+
+      "NotFoundError": {
+        "type": "string",
+        "default": "Não encontrado"
+      },
+      "ConflictError": {
+        "type": "string",
+        "default": "Já existente"
+      },
+      "UnauthorizedError": {
+        "type": "string",
+        "default": "Não autorizado"
+      },
+      "ForbiddenError": {
+        "type": "string",
+        "default": "Token de autorização é inválido !"
+      },
+      "BadRequestError": {
+        "type": "string",
+        "default": "Parâmetros errados"
+      }
+    }
+  }
+}

@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import UserRoutes from './module/user/user.js';
-import db from './db.js';
+import db from './src/db.js';
+import swaggerDocs from './utils/swagger.js';
 
 const PORT = 8800;
 
@@ -23,8 +24,12 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/docs/swaggerjs', (req, res) => {
+  res.sendFile(path.resolve(process.cwd(), './utils/swaggerUi.js'));
+});
+
+swaggerDocs(app, Number(PORT));
+
 app.use('/usuario', UserRoutes);
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running fine! http://localhost:${PORT}/`);
-});
+export default app;
