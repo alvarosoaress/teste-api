@@ -9,7 +9,7 @@ const router = express.Router();
 
 async function userExists(userEmail) {
   const query = `
-    SELECT id FROM user WHERE email = ?
+    SELECT * FROM user WHERE email = ?
     `;
 
   const res = await db.promise().query(query, userEmail);
@@ -28,6 +28,23 @@ router.route('/listar').get((req, res) => {
   db.query(query, (err, data) => {
     if (err) return res.json(err);
     return res.status(200).json(data);
+  });
+});
+
+// ---------------------------------------------------
+
+router.route('/email/:userEmail').get((req, res) => {
+  const userEmail = req.params.userEmail;
+
+  const query = `
+    SELECT nome, email
+    FROM user
+    WHERE email = ?;
+    `;
+
+  db.query(query, userEmail, (err, data) => {
+    if (err) return res.json(err);
+    return res.status(200).json(data[0]);
   });
 });
 
@@ -85,7 +102,7 @@ router
         .json(`Usuário com email [${userInfo.email}] já existe!`);
     }
 
-    if (duplicateUser && req.secureUser.id != duplicateUser) {
+    if (duplicateUser && req.secureUser.id != duplicateUser.id) {
       return res
         .status(401)
         .json(

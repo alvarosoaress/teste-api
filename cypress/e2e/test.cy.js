@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const API_URL = 'http://129.148.47.221:8800';
+const API_URL = 'http://localhost:8800';
 
 const EMAIL = 'christine@cn.com';
 
@@ -51,6 +51,17 @@ describe('API Test', () => {
       failOnStatusCode: false,
     }).then(({ status }) => {
       expect(status).to.eq(409);
+    });
+  });
+
+  it(`deve retornar [nome] e [email] do usuário cadastrado com o email [${EMAIL}]`, () => {
+    cy.request({
+      method: 'GET',
+      url: `${API_URL}/usuario/email/${EMAIL}`,
+      headers: {},
+    }).then(({ status, body }) => {
+      expect(status).to.eq(200);
+      expect(body.nome).to.eq('Christine Golden');
     });
   });
 

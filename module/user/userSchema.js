@@ -21,6 +21,16 @@ export const registerSchema = Joi.object({
 
 // ---------------------------------------------------
 
+export const getByEmailSchema = Joi.object({
+  email: Joi.string().trim().email().required().messages({
+    'string.base': `[email] deve ser do tipo texto email'`,
+    'string.empty': `[email] não pode ser vazio`,
+    'any.required': `[email] é obrigatório`,
+  }),
+});
+
+// ---------------------------------------------------
+
 export const updateSchema = Joi.object({
   email: Joi.string().trim().email().required().messages({
     'string.base': `[email] deve ser do tipo texto email'`,
