@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const API_URL = 'http://localhost:8800';
+const API_URL = 'http://129.148.47.221:8800';
 
 const EMAIL = 'christine@cn.com';
 

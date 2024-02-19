@@ -33,8 +33,14 @@ router.route('/listar').get((req, res) => {
 
 // ---------------------------------------------------
 
-router.route('/email/:userEmail').get((req, res) => {
+router.route('/email/:userEmail').get(async (req, res) => {
   const userEmail = req.params.userEmail;
+
+  const userFound = await userExists(userEmail);
+
+  if (!userFound) {
+    return res.status(404).json(`Usuário [${userEmail}] não encontrado!`);
+  }
 
   const query = `
     SELECT nome, email
