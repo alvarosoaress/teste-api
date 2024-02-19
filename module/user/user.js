@@ -7,12 +7,22 @@ import { verifyToken } from '../../jwtMiddleware.js';
 
 const router = express.Router();
 
-async function userExists(userEmail) {
-  const query = `
-    SELECT * FROM user WHERE email = ?
-    `;
+async function userExists(userEmail, userId) {
+  if (userEmail) {
+    const query = `
+        SELECT * FROM user WHERE email = ?
+        `;
 
-  const res = await db.promise().query(query, userEmail);
+    const res = await db.promise().query(query, userEmail);
+
+    return res[0][0];
+  }
+
+  const query = `
+        SELECT * FROM user WHERE id = ?
+        `;
+
+  const res = await db.promise().query(query, userId);
 
   return res[0][0];
 }
@@ -100,27 +110,25 @@ router
   .put(verifyToken, validate(updateSchema), async (req, res) => {
     const userInfo = req.user;
 
+    const userFound = await userExists(null, req.secureUser.id);
+
     const duplicateUser = await userExists(userInfo.email);
 
-    if (duplicateUser) {
+    if (!userFound) {
       return res
-        .status(409)
-        .json(`Usuário com email [${userInfo.email}] já existe!`);
+        .status(404)
+        .json(`Usuário [${userInfo.email}] não encontrado!`);
     }
 
-    if (duplicateUser && req.secureUser.id != duplicateUser.id) {
-      return res
-        .status(401)
-        .json(
-          `Você não tem permissão para realizar essa operação nesse usuário !`,
-        );
+    if (duplicateUser) {
+      return res.status(409).json(`Usuário com [${userInfo.email}] já existe!`);
     }
 
     const query = `
-    UPDATE user SET nome = ?, email = ?, senha = ? WHERE id = ${req.secureUser.id}
+    UPDATE user SET nome = ?, senha = ? WHERE id = ${req.secureUser.id}
     `;
 
-    const values = [userInfo.nome, userInfo.email, userInfo.senha];
+    const values = [userInfo.nome, userInfo.senha];
 
     db.query(query, values, (err, data) => {
       if (err) return res.json(err);
@@ -145,7 +153,7 @@ router
       return res
         .status(401)
         .json(
-          `Você não tem permissão para realizar essa operação no usuário [${decoded.sub}] !`,
+          `Você não tem permissão para realizar essa operação no usuário [${userEmail}] !`,
         );
     }
 

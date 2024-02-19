@@ -29,7 +29,6 @@ export const verifyToken = async (req, res, next) => {
       }
 
       const dbUserId = dbRes[0][0].id;
-      //   const dbUserEmail = dbRes[0][0].email;
 
       if (!dbUserId) {
         return res

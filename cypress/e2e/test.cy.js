@@ -2,9 +2,11 @@
 
 const API_URL = 'http://129.148.47.221:8800';
 
-const EMAIL = 'christine@cn.com';
+const NAME = 'Amanda';
 
-const NEW_EMAIL = 'sayu@kr.com';
+const EMAIL = 'amanda@cn.com';
+
+const NEW_EMAIL = 'alice@kr.com';
 
 describe('API Test', () => {
   let USER_TOKEN;
@@ -26,7 +28,7 @@ describe('API Test', () => {
       url: `${API_URL}/usuario/registrar`,
       headers: {},
       body: {
-        nome: 'Christine Golden',
+        nome: NAME,
         email: EMAIL,
         senha: 'senhamuitoseguraconfia7896',
       },
@@ -61,7 +63,7 @@ describe('API Test', () => {
       headers: {},
     }).then(({ status, body }) => {
       expect(status).to.eq(200);
-      expect(body.nome).to.eq('Christine Golden');
+      expect(body.nome).to.eq(NAME);
     });
   });
 
@@ -73,17 +75,17 @@ describe('API Test', () => {
         Authorization: USER_TOKEN,
       },
       body: {
-        nome: 'Sayu',
+        nome: 'Alice',
         email: NEW_EMAIL,
         senha: 'senhamuitoseguraconfia7896',
       },
     }).then(({ status, body }) => {
       expect(status).to.eq(200);
-      expect(body.nome).to.eq('Sayu');
+      expect(body.nome).to.eq('Alice');
     });
   });
 
-  it('deve impedir a atualização do email de um usuário existente para outro também já existente', () => {
+  it('deve impedir a atualização do email de usuário para um já cadastrado', () => {
     cy.request({
       method: 'PUT',
       url: `${API_URL}/usuario/atualizar`,
@@ -91,13 +93,29 @@ describe('API Test', () => {
         Authorization: USER_TOKEN,
       },
       body: {
-        nome: 'Sayu',
+        nome: 'Alice',
         email: 'joao@email.com',
         senha: 'senhamuitoseguraconfia7896',
       },
       failOnStatusCode: false,
-    }).then(({ status }) => {
+    }).then(({ status, body }) => {
       expect(status).to.eq(409);
+    });
+  });
+
+  it('deve impedir a exclusão de um usuário com email dissociado ao token', () => {
+    cy.request({
+      method: 'DELETE',
+      url: `${API_URL}/usuario/deletar`,
+      headers: {
+        Authorization: USER_TOKEN,
+      },
+      body: {
+        email: 'joao@email.com',
+      },
+      failOnStatusCode: false,
+    }).then(({ status }) => {
+      expect(status).to.eq(401);
     });
   });
 
@@ -109,7 +127,7 @@ describe('API Test', () => {
         Authorization: USER_TOKEN,
       },
       body: {
-        email: NEW_EMAIL,
+        email: EMAIL,
       },
     }).then(({ status }) => {
       expect(status).to.eq(200);
